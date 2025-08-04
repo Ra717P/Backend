@@ -8,6 +8,10 @@ type TResgister = {
   password: string;
   confirmPassword: string;
 };
+type TLogin = {
+  identifier: string;
+  password: string;
+};
 const registerValidateSchema = Yup.object({
   fullName: Yup.string().required(),
   userName: Yup.string().required(),
@@ -40,6 +44,16 @@ export default {
         message: "Succes Registration!",
         data: result,
       });
+    } catch (error) {
+      const err = error as unknown as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+  async login(req: Request, res: Response) {
+    try {
     } catch (error) {
       const err = error as unknown as Error;
       res.status(400).json({
