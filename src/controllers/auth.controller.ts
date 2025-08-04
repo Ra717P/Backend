@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import * as Yup from "yup";
-import Usermodel from "../models/user.model";
-type TResgister = {
+import UserModel from "../models/user.model";
+import { encrypt } from "../utils/encryption";
+type TRegister = {
   fullName: string;
   userName: string;
   email: string;
@@ -24,7 +25,7 @@ const registerValidateSchema = Yup.object({
 export default {
   async register(req: Request, res: Response) {
     const { fullName, userName, email, password, confirmPassword } =
-      req.body as unknown as TResgister;
+      req.body as unknown as TRegister;
 
     try {
       await registerValidateSchema.validate({
@@ -34,7 +35,7 @@ export default {
         password,
         confirmPassword,
       });
-      const result = await Usermodel.create({
+      const result = await UserModel.create({
         fullName,
         email,
         userName,
@@ -53,7 +54,38 @@ export default {
     }
   },
   async login(req: Request, res: Response) {
+    const { identifier, password } = req.body as unknown as TLogin;
     try {
+      //ambil data user berdasarkan identifier -> email & username
+      const userByIdentifier = await UserModel.findOne({
+        $or: [
+          {
+            email: identifier,
+          },
+          {
+            userName: identifier,
+          },
+        ],
+      });
+      if (!userByIdentifier) {
+        return res.status(403).json({
+          massage: "user not found",
+          data: null,
+        });
+      }
+      //validasi password
+      const validatePassword: boolean =
+        encrypt(password) === userByIdentifier.password;
+      if (!validatePassword) {
+        return res.status(403).json({
+          massage: "user not found",
+          data: null,
+        });
+      }
+      res.status(200).json({
+        massage: "Login Succesfull",
+        data: userByIdentifier,
+      });
     } catch (error) {
       const err = error as unknown as Error;
       res.status(400).json({
