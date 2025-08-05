@@ -91,7 +91,7 @@ export default {
       });
       res.status(200).json({
         massage: "Login Succesfull",
-        data: userByIdentifier,
+        data: token,
       });
     } catch (error) {
       const err = error as unknown as Error;
@@ -100,5 +100,33 @@ export default {
         data: null,
       });
     }
+  },
+
+  async me(req: Request, res: Response) {
+    return res.status(200).json({
+      massage: "user caruik found",
+      data: [
+        {
+          rafif: [
+            {
+              kontol: "5cm",
+            },
+            {
+              totalCaruik: "99999999999999999999999",
+            },
+          ],
+        },
+        {
+          ragas: [
+            {
+              kontol: "1cm",
+            },
+            {
+              totalCaruik: "99999999999999999999999999999999999999999999999999",
+            },
+          ],
+        },
+      ],
+    });
   },
 };
