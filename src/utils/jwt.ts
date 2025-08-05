@@ -22,4 +22,7 @@ export const generateToken = (user: IUserToken): string => {
   });
   return token;
 };
-export const getUserData = (token: string) => {};
+export const getUserData = (token: string) => {
+  const user = jwt.verify(token, SECRET) as IUserToken;
+  return user;
+};

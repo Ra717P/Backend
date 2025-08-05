@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as Yup from "yup";
 import UserModel from "../models/user.model";
 import { encrypt } from "../utils/encryption";
+import { generateToken } from "../utils/jwt";
 type TRegister = {
   fullName: string;
   userName: string;
@@ -53,9 +54,11 @@ export default {
       });
     }
   },
+  // Method async login yang menerima request dan response dari Express
   async login(req: Request, res: Response) {
-    const { identifier, password } = req.body as unknown as TLogin;
+    // Mengambil data 'identifier' dan 'password' dari body request,dan memaksa tipenya menjadi TLogin (type-safe cast)
     try {
+      const { identifier, password } = req.body as unknown as TLogin;
       //ambil data user berdasarkan identifier -> email & username
       const userByIdentifier = await UserModel.findOne({
         $or: [
@@ -82,6 +85,10 @@ export default {
           data: null,
         });
       }
+      const token = generateToken({
+        id: userByIdentifier._id,
+        role: userByIdentifier.role,
+      });
       res.status(200).json({
         massage: "Login Succesfull",
         data: userByIdentifier,
