@@ -19,7 +19,7 @@ router.post("/auth/register", authController.register);
 // maka fungsi login dari authController akan dijalankan
 router.post("/auth/login", authController.login);
 
-router.get("/auth/me", authController.me);
+router.get("/auth/me", authMiddleware, authController.me);
 
 // Mengekspor router agar bisa digunakan di file lain seperti app.ts atau index.ts
 // Misalnya digunakan dengan app.use("/api", authRoutes) di file utama

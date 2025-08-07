@@ -6,12 +6,13 @@ export interface IReqUser extends Request {
 }
 
 export default (req: Request, res: Response, next: NextFunction) => {
-  const authorization = req.header;
+  const authorization = req.header?.authorization;
 
   if (!authorization) {
-    return res.status(402).json({
+    return res.status(403).json({
       massage: "unauthorization",
       data: null,
     });
   }
+  const [prefix, accesToken] = authorization.split(" ");
 };
