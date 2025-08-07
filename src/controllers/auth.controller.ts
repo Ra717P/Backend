@@ -3,6 +3,7 @@ import * as Yup from "yup";
 import UserModel from "../models/user.model";
 import { encrypt } from "../utils/encryption";
 import { generateToken } from "../utils/jwt";
+import { IReqUser } from "../middlewares/auth.middleware";
 type TRegister = {
   fullName: string;
   userName: string;
@@ -102,31 +103,21 @@ export default {
     }
   },
 
-  async me(req: Request, res: Response) {
-    return res.status(200).json({
-      massage: "user caruik found",
-      data: [
-        {
-          rafif: [
-            {
-              kontol: "5cm",
-            },
-            {
-              totalCaruik: "99999999999999999999999",
-            },
-          ],
-        },
-        {
-          ragas: [
-            {
-              kontol: "1cm",
-            },
-            {
-              totalCaruik: "99999999999999999999999999999999999999999999999999",
-            },
-          ],
-        },
-      ],
-    });
+  async me(req: IReqUser, res: Response) {
+    try {
+      const user = req.user;
+      const result = await UserModel.findById(user?.id);
+
+      res.status(200).json({
+        message: "Get User Data Success",
+        data: result,
+      });
+    } catch (error) {
+      const err = error as unknown as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
   },
 };

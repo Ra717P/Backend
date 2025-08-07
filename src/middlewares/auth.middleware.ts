@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { IUserToken } from "../utils/jwt";
+import { getUserData, IUserToken } from "../utils/jwt";
 
 export interface IReqUser extends Request {
   user?: IUserToken;
 }
-
 export default (req: Request, res: Response, next: NextFunction) => {
-  const authorization = req.header?.authorization;
+  const authorization = req.headers["authorization"];
 
   if (!authorization) {
     return res.status(403).json({
@@ -14,5 +13,20 @@ export default (req: Request, res: Response, next: NextFunction) => {
       data: null,
     });
   }
-  const [prefix, accesToken] = authorization.split(" ");
+  const [prefix, token] = authorization.split(" ");
+  if (!(prefix === "Bearer" && token)) {
+    return res.status(403).json({
+      massage: "unauthorization",
+      data: null,
+    });
+  }
+  const user = getUserData(token);
+  if (!user) {
+    return res.status(403).json({
+      massage: "unauthorization",
+      data: null,
+    });
+  }
+  (req as IReqUser).user = user;
+  next();
 };
